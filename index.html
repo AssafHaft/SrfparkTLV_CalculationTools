@@ -1,103 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>pool-srf-park-tlv-pool-calculations</title>
-  <meta name="description" content="Mobile-friendly pool calculators for SRF Park TLV: chlorine dosing, fill & flow timing, and turnover planning." />
+  <title>SrfparkTLV - Tools & Calculators</title>
+  <meta name="description" content="Mobile-friendly pool calculators for SRF Park TLV: chlorine dosing and water fill by level with full-volume calibration." />
   <style>
-    :root{
-      --bg: #0b1320;        /* deep navy */
-      --card:#111a2b;       /* card base */
-      --ink:#ecf1ff;        /* text */
-      --muted:#a8b3d1;      /* secondary text */
-      --accent:#3ea6ff;     /* focus/cta */
-      --good:#5bd165;       /* success */
-      --warn:#ffcc66;       /* warn */
-      --bad:#ff6b6b;        /* error */
-      --line:#1f2b44;       /* dividers */
-      --shadow: 0 6px 20px rgba(0,0,0,.35);
-      --radius: 18px;
-    }
-    * { box-sizing: border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 600px at 15% -10%, #14213d 0%, transparent 60%),
-                  radial-gradient(1000px 500px at 95% 10%, #12243b 0%, transparent 60%),
-                  var(--bg);
-      color: var(--ink);
-      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-    }
-    header{
-      position: sticky; top:0; z-index: 5;
-      backdrop-filter: blur(8px);
-      background: linear-gradient(180deg, rgba(11,19,32,.85), rgba(11,19,32,.65));
-      border-bottom: 1px solid var(--line);
-    }
-    .wrap{ max-width: 1100px; margin: 0 auto; padding: 18px 16px; }
-    h1{ font-size: clamp(22px, 3.6vw, 34px); margin:0; letter-spacing:.2px; }
-    .sub{ color: var(--muted); font-size: 13px; margin-top: 6px; }
-
-    main{ padding: 20px 16px 60px; }
-    .grid{ display:grid; gap: 18px; grid-template-columns: 1fr; }
-    @media (min-width: 880px){ .grid{ grid-template-columns: repeat(3, 1fr); } }
-
-    .card{
-      background: linear-gradient(180deg, rgba(17,26,43,.85), rgba(17,26,43,.75));
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      display: flex; flex-direction: column;
-      min-height: 420px;
-    }
-    .card h2{ font-size: 18px; margin: 0; padding: 16px; border-bottom: 1px solid var(--line); }
-    .card .body{ padding: 14px 16px 16px; display:grid; gap:12px; }
-
-    form{ display:grid; gap:10px; }
-    .row{ display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:end; }
-    .label{ font-size: 12px; color: var(--muted); margin-bottom: 4px; display:flex; align-items:center; gap:8px; }
-    .req{ font-size: 10px; color: var(--bg); background: var(--accent); padding: 2px 6px; border-radius: 999px; }
-    .opt{ font-size: 10px; color: var(--ink); background: #26324d; padding: 2px 6px; border-radius: 999px; }
-    .help{ font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-    input, select{ width:100%; padding: 10px 12px; border: 1px solid var(--line); background:#0f1726; color: var(--ink); border-radius: 12px; font-size:14px; }
-    input[readonly]{ background:#0b1320; opacity:.9; }
-    input:focus{ outline: 2px solid transparent; box-shadow: 0 0 0 2px var(--accent); }
-
-    .kpi{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-    .kpi .box{ background:#0b1320; border:1px solid var(--line); border-radius: 14px; padding:12px; }
-    .kpi .t{ font-size: 11px; color: var(--muted); }
-    .kpi .v{ font-size: 20px; margin-top: 6px; font-variant-numeric: tabular-nums; }
-
-    .footer{
-      margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:8px; padding: 12px 16px; border-top:1px solid var(--line);
-    }
-    .btn{ border:1px solid var(--line); background:#0f1a2b; color:var(--ink); padding: 10px 12px; border-radius: 12px; font-weight:600; cursor:pointer; }
-    .btn.primary{ background: linear-gradient(180deg,#3ea6ff,#2680d9); border-color: #1d5fb1; color:#061427; }
-
-    .note{ font-size: 11px; color: var(--muted); }
-    .ok{ color: var(--good); }
-    .warn{ color: var(--warn); }
-    .err{ color: var(--bad); }
-
-    .table{ width:100%; border-collapse: collapse; font-size: 13px; }
-    .table th,.table td{ border-bottom: 1px dashed var(--line); padding: 6px 4px; text-align:left; }
-    .table th{ color: var(--muted); font-weight:600; }
-
-    .seg{ margin-top:4px; padding-top:10px; border-top:1px dashed var(--line); }
-    details{ background:#0b1320; border:1px solid var(--line); border-radius:12px; padding:8px 10px; }
-    summary{ cursor:pointer; color:var(--muted); }
-
-    footer.site{ text-align:center; color:var(--muted); font-size:12px; padding:24px 10px 40px; }
-    a, a:visited{ color: var(--accent); text-decoration: none; }
+    :root{ --bg:#0b1320; --card:#111a2b; --ink:#ecf1ff; --muted:#a8b3d1; --accent:#3ea6ff; --line:#1f2b44; --good:#5bd165; --warn:#ffcc66; --bad:#ff6b6b; --shadow:0 6px 20px rgba(0,0,0,.35); --radius:18px; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background: radial-gradient(1200px 600px at 15% -10%, #14213d 0%, transparent 60%), radial-gradient(1000px 500px at 95% 10%, #12243b 0%, transparent 60%), var(--bg); color:var(--ink)}
+    header{position:sticky;top:0;z-index:5;backdrop-filter:blur(8px);background:linear-gradient(180deg,rgba(11,19,32,.85),rgba(11,19,32,.65));border-bottom:1px solid var(--line)}
+    .wrap{max-width:980px;margin:0 auto;padding:18px 16px;position:relative}
+    h1{margin:0;font-size:clamp(22px,3.4vw,34px)}
+    .sub{color:var(--muted);font-size:13px;margin-top:6px}
+    .lang-toggle{position:absolute;right:16px;top:16px}
+    main{padding:20px 16px 60px}
+    .grid{display:grid;gap:18px;grid-template-columns:1fr}
+    @media(min-width:880px){.grid{grid-template-columns:repeat(2,1fr)}}
+    .card{background:linear-gradient(180deg,rgba(17,26,43,.85),rgba(17,26,43,.75));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:420px}
+    .card h2{font-size:18px;margin:0;padding:16px;border-bottom:1px solid var(--line)}
+    .card .body{padding:14px 16px 16px;display:grid;gap:12px}
+    form{display:grid;gap:10px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .label{font-size:12px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+    .req{font-size:10px;color:#061427;background:var(--accent);padding:2px 6px;border-radius:999px}
+    .opt{font-size:10px;color:var(--ink);background:#26324d;padding:2px 6px;border-radius:999px}
+    .help{font-size:11px;color:var(--muted);margin-top:4px}
+    input,select{width:100%;padding:10px 12px;border:1px solid var(--line);background:#0f1726;color:var(--ink);border-radius:12px;font-size:14px}
+    input[readonly]{background:#0b1320;opacity:.9}
+    input:focus{outline:2px solid transparent;box-shadow:0 0 0 2px var(--accent)}
+    .kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .kpi .box{background:#0b1320;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .kpi .t{font-size:11px;color:var(--muted)}
+    .kpi .v{font-size:20px;margin-top:6px;font-variant-numeric:tabular-nums}
+    .footer{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+    .btn{border:1px solid var(--line);background:#0f1a2b;color:var(--ink);padding:10px 12px;border-radius:12px;font-weight:600;cursor:pointer}
+    .btn.primary{background:linear-gradient(180deg,#3ea6ff,#2680d9);border-color:#1d5fb1;color:#061427}
+    .note{font-size:11px;color:var(--muted)}
+    .ok{color:var(--good)} .warn{color:var(--warn)} .err{color:var(--bad)}
+    .table{width:100%;border-collapse:collapse;font-size:13px}
+    .table th,.table td{border-bottom:1px dashed var(--line);padding:6px 4px;text-align:left}
+    .table th{color:var(--muted);font-weight:600}
+    .seg{margin-top:4px;padding-top:10px;border-top:1px dashed var(--line)}
+    .rtl{direction:rtl}
+    footer.site{text-align:center;color:var(--muted);font-size:12px;padding:24px 10px 40px}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
-      <h1>pool-srf-park-tlv-pool-calculations</h1>
-      <div class="sub">Chlorine dosing • Fill & flow timing • Turnover planner — mobile-first, clear required inputs only</div>
+      <h1 id="title">SrfparkTLV - Tools & Calculators</h1>
+      <div class="sub" id="subtitle">Two calculators — Chlorine dosing & Water fill by level — mobile-first and simple</div>
+      <button id="lang-toggle" class="btn lang-toggle" type="button">עברית</button>
     </div>
   </header>
 
@@ -106,99 +61,105 @@
 
       <!-- 1) Chlorine Dose Calculator -->
       <section class="card" id="chlorine-card">
-        <h2>Chlorine Dose</h2>
+        <h2 id="h2-chlorine">Chlorine Dose</h2>
         <div class="body">
           <form id="chlorine-form">
             <div>
-              <label class="label">Pool volume (m³) <span class="req">Required</span></label>
+              <label class="label" id="lbl-vol">Pool volume (m³) <span class="req" id="req">Required</span></label>
               <input type="number" id="vol_m3" min="0" step="0.01" value="29000" required />
-              <div class="help">Total water volume.</div>
+              <div class="help" id="help-vol">Total water volume.</div>
             </div>
             <div class="row">
               <div>
-                <label class="label">Current FC (ppm) <span class="req">Required</span></label>
+                <label class="label" id="lbl-fc-now">Current FC (ppm) <span class="req">Required</span></label>
                 <input type="number" id="fc_now" min="0" step="0.01" placeholder="e.g., 0.2" required />
               </div>
               <div>
-                <label class="label">Target FC (ppm) <span class="req">Required</span></label>
+                <label class="label" id="lbl-fc-target">Target FC (ppm) <span class="req">Required</span></label>
                 <input type="number" id="fc_target" min="0" step="0.01" placeholder="e.g., 0.8" required />
               </div>
             </div>
             <div class="row">
               <div>
-                <label class="label">Chlorine concentration (%) <span class="req">Required</span></label>
+                <label class="label" id="lbl-cl-percent">Chlorine concentration (%) <span class="req">Required</span></label>
                 <input type="number" id="cl_percent" min="1" max="20" step="0.1" value="12" required />
               </div>
               <div>
-                <label class="label">Bleach density (kg/L) <span class="opt">Default 1.20</span></label>
+                <label class="label" id="lbl-density">Bleach density (kg/L) <span class="opt" id="opt-density">Default 1.20</span></label>
                 <input type="number" id="bleach_density" min="1.00" max="1.30" step="0.01" value="1.20" />
               </div>
             </div>
-
             <details class="seg">
-              <summary>How this works</summary>
-              <div class="help">Δppm × volume(L) gives mg of available chlorine required. Liters of liquid = required_mass / (concentration × density).</div>
+              <summary id="sum-how">How this works</summary>
+              <div class="help" id="help-how">Δppm × volume(L) gives kg of available chlorine required / 1e6. Liters of liquid = required_mass / (concentration × density).</div>
             </details>
           </form>
 
           <div class="kpi">
             <div class="box">
-              <div class="t">Δppm (target − current)</div>
+              <div class="t" id="kpi-dppm">Δppm (target − current)</div>
               <div class="v" id="delta_ppm">–</div>
             </div>
             <div class="box">
-              <div class="t">Liquid chlorine needed</div>
+              <div class="t" id="kpi-liters">Liquid chlorine needed</div>
               <div class="v" id="liters_needed">– L</div>
             </div>
           </div>
 
           <table class="table seg">
-            <thead><tr><th>Item</th><th>Value</th></tr></thead>
+            <thead><tr><th id="th-item">Item</th><th id="th-value">Value</th></tr></thead>
             <tbody>
-              <tr><td>Pool volume (L)</td><td id="vol_l">–</td></tr>
-              <tr><td>Available chlorine per liter</td><td id="avail_per_L">– kg/L</td></tr>
-              <tr><td>Total required chlorine</td><td id="req_chlorine">– kg</td></tr>
+              <tr><td id="row-volL">Pool volume (L)</td><td id="vol_l">–</td></tr>
+              <tr><td id="row-avail">Available chlorine per liter</td><td id="avail_per_L">– kg/L</td></tr>
+              <tr><td id="row-req">Total required chlorine</td><td id="req_chlorine">– kg</td></tr>
             </tbody>
           </table>
         </div>
         <div class="footer">
-          <button class="btn primary" onclick="calcChlorine()">Calculate</button>
+          <button class="btn primary" id="btn-calc-1" onclick="calcChlorine()">Calculate</button>
           <div class="note" id="chlorine-note">Fill required fields, then Calculate.</div>
         </div>
       </section>
 
-      <!-- 2) Fill / Flow Timing -->
-      <section class="card" id="fill-card">
-        <h2>Fill & Flow Timing</h2>
+      <!-- 2) Water Fill by Level (Calibrated by Full Volume & Full Level) -->
+      <section class="card" id="level-card">
+        <h2 id="h2-level">Water Fill by Level</h2>
         <div class="body">
-          <form id="fill-form">
-            <div>
-              <label class="label">Flow rate (m³/h) <span class="req">Required</span></label>
-              <input type="number" id="flow_m3h" min="0" step="0.01" placeholder="e.g., 99" required />
-              <div class="help">Average effective fill rate.</div>
+          <form id="level-form">
+            <div class="row">
+              <div>
+                <label class="label" id="lbl-full-vol">Full pool volume (m³) <span class="req">Required</span></label>
+                <input type="number" id="full_vol_m3" min="0" step="0.01" value="29000" required />
+              </div>
+              <div>
+                <label class="label" id="lbl-full-lvl">Full water level height (m) <span class="req">Required</span></label>
+                <input type="number" id="full_level_m" min="0" step="0.001" value="2.88" required />
+              </div>
             </div>
             <div class="row">
               <div>
-                <label class="label">Current volume (m³) <span class="opt">Optional</span></label>
-                <input type="number" id="cur_vol_m3" min="0" step="0.01" />
+                <label class="label" id="lbl-now-lvl">Current water level (m) <span class="req">Required</span></label>
+                <input type="number" id="level_now_m" min="-10" step="0.001" placeholder="e.g., 1.35" required />
               </div>
               <div>
-                <label class="label">Target volume (m³) <span class="opt">Optional</span></label>
-                <input type="number" id="tgt_vol_m3" min="0" step="0.01" />
+                <label class="label" id="lbl-target-lvl">Target water level (m) <span class="req">Required</span></label>
+                <input type="number" id="level_target_m" min="-10" step="0.001" placeholder="e.g., 1.45" required />
               </div>
             </div>
-            <div>
-              <div class="label">OR provide Volume to add (m³) <span class="req">Required if no target volume</span></div>
-              <input type="number" id="delta_m3" min="0" step="0.01" placeholder="e.g., 120" />
-              <div class="help">If you enter both current & target, this will be auto-calculated.</div>
-            </div>
-            <div class="row">
-              <div>
-                <label class="label">Start time <span class="opt">Default: now</span></label>
-                <input type="datetime-local" id="start_time" />
+            <details class="seg">
+              <summary id="sum-optional">Optional timing (if you want finish time)</summary>
+              <div class="row">
+                <div>
+                  <label class="label" id="lbl-flow">Fill flow rate (m³/h) <span class="opt">Optional</span></label>
+                  <input type="number" id="flow_m3h" min="0" step="0.01" placeholder="e.g., 99" />
+                </div>
+                <div>
+                  <label class="label" id="lbl-start">Start time <span class="opt">Default: now</span></label>
+                  <input type="datetime-local" id="start_time" />
+                </div>
               </div>
               <div>
-                <label class="label">Round result to <span class="opt">Optional</span></label>
+                <label class="label" id="lbl-round">Round finish to <span class="opt">Optional</span></label>
                 <select id="round_to">
                   <option value="1">1 min</option>
                   <option value="5" selected>5 min</option>
@@ -206,111 +167,55 @@
                   <option value="15">15 min</option>
                 </select>
               </div>
-            </div>
+            </details>
+            <div class="help" id="help-calib">Using a linear calibration: area = full_volume / full_level; ΔV = (target − current) × area.</div>
           </form>
 
           <div class="kpi">
             <div class="box">
-              <div class="t">Duration</div>
-              <div class="v" id="fill_duration">–</div>
+              <div class="t" id="kpi-dh">Height to add</div>
+              <div class="v" id="delta_h_out">– m</div>
             </div>
             <div class="box">
-              <div class="t">Finish time</div>
-              <div class="v" id="finish_time">–</div>
+              <div class="t" id="kpi-dv">Volume to add</div>
+              <div class="v" id="delta_v_out">– m³</div>
             </div>
           </div>
 
           <table class="table seg">
-            <thead><tr><th>Item</th><th>Value</th></tr></thead>
+            <thead><tr><th id="th-item-2">Item</th><th id="th-value-2">Value</th></tr></thead>
             <tbody>
-              <tr><td>Volume to add (m³)</td><td id="delta_m3_out">–</td></tr>
-              <tr><td>Flow rate (m³/h)</td><td id="flow_out">–</td></tr>
-              <tr><td>Computed hours</td><td id="hours_out">– h</td></tr>
-            </tbody>
-          </table>
-
-        </div>
-        <div class="footer">
-          <button class="btn primary" onclick="calcFill()">Calculate</button>
-          <div class="note" id="fill-note">Provide flow & either (current + target) or (volume to add).</div>
-        </div>
-      </section>
-
-      <!-- 3) Turnover & Circulation Planner -->
-      <section class="card" id="turnover-card">
-        <h2>Turnover & Circulation</h2>
-        <div class="body">
-          <form id="turnover-form">
-            <div>
-              <label class="label">Pool volume (m³) <span class="req">Required</span></label>
-              <input type="number" id="to_vol_m3" min="0" step="0.01" placeholder="e.g., 29000" required />
-            </div>
-            <div>
-              <label class="label">Flow rate (m³/h) <span class="req">Required</span></label>
-              <input type="number" id="to_flow_m3h" min="0" step="0.01" placeholder="e.g., 99" required />
-            </div>
-            <div class="row">
-              <div>
-                <label class="label">Desired turnovers / day <span class="opt">Optional</span></label>
-                <input type="number" id="to_turnovers" min="0" step="0.1" placeholder="e.g., 1.5" />
-              </div>
-              <div>
-                <label class="label">Planned runtime (h/day) <span class="opt">Optional</span></label>
-                <input type="number" id="to_runtime_h" min="0" step="0.1" placeholder="e.g., 20" />
-              </div>
-            </div>
-          </form>
-
-          <div class="kpi">
-            <div class="box">
-              <div class="t">Hours per turnover</div>
-              <div class="v" id="to_hours_per">– h</div>
-            </div>
-            <div class="box">
-              <div class="t">Turnovers @ runtime</div>
-              <div class="v" id="to_achieved">– /day</div>
-            </div>
-          </div>
-
-          <table class="table seg">
-            <thead><tr><th>Plan</th><th>Value</th></tr></thead>
-            <tbody>
-              <tr><td>Hours to 1 turnover</td><td id="to_h_1">– h</td></tr>
-              <tr><td>Hours to 2 turnovers</td><td id="to_h_2">– h</td></tr>
-              <tr><td>Runtime for desired turnovers</td><td id="to_runtime_needed">– h/day</td></tr>
+              <tr><td id="row-dvL">Volume to add (L)</td><td id="delta_v_l_out">– L</td></tr>
+              <tr><td id="row-hrs">Computed hours (if flow given)</td><td id="hours_out">– h</td></tr>
+              <tr><td id="row-finish">Finish time (if flow & start given)</td><td id="finish_time">–</td></tr>
             </tbody>
           </table>
         </div>
         <div class="footer">
-          <button class="btn primary" onclick="calcTurnover()">Calculate</button>
-          <div class="note" id="turnover-note">Enter volume & flow. Add a target or runtime for more detail.</div>
+          <button class="btn primary" id="btn-calc-2" onclick="calcLevel()">Calculate</button>
+          <div class="note" id="level-note">Enter full volume & full level, then current and target. Optional: flow & start.</div>
         </div>
       </section>
 
     </div>
 
     <section class="seg" style="margin-top:24px;">
-      <h3 style="margin:0 0 8px 0; font-size:16px;">Usage notes</h3>
-      <ul style="margin:8px 0 0 18px; line-height:1.6; color:var(--muted);">
-        <li>Only the inputs are editable. Results update when you press <strong>Calculate</strong>.</li>
-        <li>All units are metric (m³, L, h). Time displays in your local timezone with a 24‑hour format.</li>
-        <li>Numbers are rounded for display; underlying calculations keep full precision.</li>
+      <h3 style="margin:0 0 8px 0; font-size:16px;" id="usage-title">Usage notes</h3>
+      <ul style="margin:8px 0 0 18px; line-height:1.6; color:var(--muted);" id="usage-list">
+        <li id="usage-1">Only the input fields are editable. Results update when you press <strong>Calculate</strong>.</li>
+        <li id="usage-2">All units are metric (m³, L, m, h). Time displays in your local timezone with a 24‑hour format.</li>
+        <li id="usage-3">Numbers are rounded for display; underlying calculations keep full precision.</li>
       </ul>
     </section>
   </main>
 
-  <footer class="site">
-    Made for SRF Park TLV • v1.0 • Single‑file app — ready for GitHub Pages.
+  <footer class="site" id="footer-site">
+    Made for SRF Park TLV • v1.2 • Single‑file app — ready for GitHub Pages.
   </footer>
 
   <script>
-    function fmt(n, digits=2){
-      if(Number.isNaN(+n)) return '–';
-      return (+n).toLocaleString(undefined,{maximumFractionDigits:digits, minimumFractionDigits:0});
-    }
-    function roundToMinutes(date, minutes){
-      const ms = minutes*60*1000; return new Date(Math.round(date.getTime()/ms)*ms);
-    }
+    function fmt(n, digits=2){ if(Number.isNaN(+n)) return '–'; return (+n).toLocaleString(undefined,{maximumFractionDigits:digits, minimumFractionDigits:0}); }
+    function roundToMinutes(date, minutes){ const ms = minutes*60*1000; return new Date(Math.round(date.getTime()/ms)*ms); }
 
     // 1) Chlorine Dose
     function calcChlorine(){
@@ -319,11 +224,10 @@
       const fcTgt = parseFloat(document.getElementById('fc_target').value);
       const pct = parseFloat(document.getElementById('cl_percent').value);
       const rho = parseFloat(document.getElementById('bleach_density').value || '1.2');
-
       const note = document.getElementById('chlorine-note');
-      if([V,fcNow,fcTgt,pct,rho].some(x=>Number.isNaN(x))){ note.textContent = 'Please complete all required fields.'; note.className='note err'; return; }
-      if(fcTgt < fcNow){ note.textContent = 'Target is below current. No addition needed.'; note.className='note warn'; }
-      else { note.textContent = 'Calculation complete.'; note.className='note ok'; }
+
+      if([V,fcNow,fcTgt,pct,rho].some(x=>Number.isNaN(x))){ note.textContent = currentLang==='he'? i18n.he.notes.needFields : i18n.en.notes.needFields; note.className='note err'; return; }
+      if(fcTgt < fcNow){ note.textContent = currentLang==='he'? i18n.he.notes.targetLow : i18n.en.notes.targetLow; note.className='note warn'; } else { note.textContent = currentLang==='he'? i18n.he.notes.calc : i18n.en.notes.calc; note.className='note ok'; }
 
       const volL = V * 1000; // liters
       const dppm = Math.max(0, fcTgt - fcNow); // mg/L
@@ -338,91 +242,156 @@
       document.getElementById('req_chlorine').textContent = isFinite(req_kg)? `${fmt(req_kg,3)} kg` : '–';
     }
 
-    // 2) Fill & Flow Timing
-    function calcFill(){
-      const flow = parseFloat(document.getElementById('flow_m3h').value);
-      const curV = parseFloat(document.getElementById('cur_vol_m3').value);
-      const tgtV = parseFloat(document.getElementById('tgt_vol_m3').value);
-      let dV = parseFloat(document.getElementById('delta_m3').value);
+    // 2) Water Fill by Level (calibrated)
+    function calcLevel(){
+      const Vfull = parseFloat(document.getElementById('full_vol_m3').value); // m3
+      const Hfull = parseFloat(document.getElementById('full_level_m').value); // m
+      const Hn = parseFloat(document.getElementById('level_now_m').value); // m
+      const Ht = parseFloat(document.getElementById('level_target_m').value); // m
+      const Q = parseFloat(document.getElementById('flow_m3h').value); // m3/h (optional)
+      const startStr = document.getElementById('start_time').value; // optional
       const roundMin = parseInt(document.getElementById('round_to').value,10) || 5;
+      const note = document.getElementById('level-note');
 
-      const note = document.getElementById('fill-note');
-      if(Number.isFinite(curV) && Number.isFinite(tgtV)){
-        dV = Math.max(0, tgtV - curV);
-        document.getElementById('delta_m3').value = dV ? dV.toFixed(2) : '';
-      }
-      if(Number.isNaN(flow) || (!Number.isFinite(dV) || dV<=0)){
-        note.textContent = 'Need flow and a positive volume to add.'; note.className='note err';
-        document.getElementById('delta_m3_out').textContent = '–';
-        document.getElementById('flow_out').textContent = '–';
+      if([Vfull,Hfull,Hn,Ht].some(x=>Number.isNaN(x)) || Hfull<=0){
+        note.textContent = currentLang==='he'? i18n.he.level.needFields : i18n.en.level.needFields; note.className='note err'; return; }
+
+      const A = Vfull / Hfull; // m2 (effective surface area assuming linear relationship)
+      const dH = Math.max(0, Ht - Hn); // m
+      const dV = dH * A; // m3
+      const dVL = dV * 1000; // L
+
+      document.getElementById('delta_h_out').textContent = `${fmt(dH,3)} m`;
+      document.getElementById('delta_v_out').textContent = `${fmt(dV,2)} m³`;
+      document.getElementById('delta_v_l_out').textContent = `${fmt(dVL,0)} L`;
+
+      if(Number.isFinite(Q) && Q>0 && dV>0){
+        const hours = dV / Q; // h
+        document.getElementById('hours_out').textContent = `${fmt(hours,3)} h`;
+        const start = startStr ? new Date(startStr) : new Date();
+        const finish = new Date(start.getTime() + hours*3600*1000);
+        const finishRounded = roundToMinutes(finish, roundMin);
+        document.getElementById('finish_time').textContent = finishRounded.toLocaleString([], {hour12:false});
+      } else {
         document.getElementById('hours_out').textContent = '– h';
-        document.getElementById('fill_duration').textContent = '–';
         document.getElementById('finish_time').textContent = '–';
-        return;
       }
-      note.textContent = 'Calculation complete.'; note.className='note ok';
 
-      const hours = dV / flow; // hours
-      const mins = hours * 60;
-
-      // Start time: default now in local tz
-      let startStr = document.getElementById('start_time').value;
-      let start = startStr ? new Date(startStr) : new Date();
-      const finish = new Date(start.getTime() + mins*60*1000);
-
-      // Round finish to desired minute grid for easy planning
-      const finishRounded = roundToMinutes(finish, roundMin);
-      const totalMinsRounded = (finishRounded - start) / (60*1000);
-      const h = Math.floor(totalMinsRounded/60), m = Math.round(totalMinsRounded%60);
-
-      document.getElementById('delta_m3_out').textContent = fmt(dV,2);
-      document.getElementById('flow_out').textContent = fmt(flow,2);
-      document.getElementById('hours_out').textContent = fmt(hours,3) + ' h';
-      document.getElementById('fill_duration').textContent = `${h}h ${m}m`;
-      document.getElementById('finish_time').textContent = finishRounded.toLocaleString([], {hour12:false});
+      if(dV>0){ note.textContent = currentLang==='he'? i18n.he.notes.calc : i18n.en.notes.calc; note.className='note ok'; }
+      else { note.textContent = currentLang==='he'? i18n.he.level.noFill : i18n.en.level.noFill; note.className='note warn'; }
     }
 
-    // 3) Turnover & Circulation
-    function calcTurnover(){
-      const V = parseFloat(document.getElementById('to_vol_m3').value);
-      const Q = parseFloat(document.getElementById('to_flow_m3h').value);
-      const T = parseFloat(document.getElementById('to_turnovers').value);
-      const R = parseFloat(document.getElementById('to_runtime_h').value);
-      const note = document.getElementById('turnover-note');
-
-      if([V,Q].some(x=>Number.isNaN(x) || x<=0)){
-        note.textContent = 'Enter positive volume and flow.'; note.className='note err';
-        document.getElementById('to_hours_per').textContent = '– h';
-        document.getElementById('to_achieved').textContent = '– /day';
-        document.getElementById('to_h_1').textContent = '– h';
-        document.getElementById('to_h_2').textContent = '– h';
-        document.getElementById('to_runtime_needed').textContent = '– h/day';
-        return;
+    // Language toggle & i18n
+    const i18n = {
+      en: {
+        title: 'SrfparkTLV - Tools & Calculators',
+        subtitle: 'Two calculators — Chlorine dosing & Water fill by level — mobile-first and simple',
+        h2_chlorine: 'Chlorine Dose', h2_level: 'Water Fill by Level',
+        required: 'Required', optional: 'Optional', defaultNow: 'Default: now', defaultDensity: 'Default 1.20',
+        lbl_vol: 'Pool volume (m³)', lbl_fc_now:'Current FC (ppm)', lbl_fc_target:'Target FC (ppm)', lbl_cl_percent:'Chlorine concentration (%)', lbl_density:'Bleach density (kg/L)',
+        help_vol: 'Total water volume.', how_title:'How this works', how_help:'Δppm × volume(L) gives kg of available chlorine required / 1e6. Liters of liquid = required_mass / (concentration × density).',
+        full_vol:'Full pool volume (m³)', full_level:'Full water level height (m)', now_level:'Current water level (m)', target_level:'Target water level (m)',
+        optionalTiming:'Optional timing (if you want finish time)', flow:'Fill flow rate (m³/h)', start:'Start time', round:'Round finish to',
+        calib_help:'Using a linear calibration: area = full_volume / full_level; ΔV = (target − current) × area.',
+        kpi_dppm:'Δppm (target − current)', kpi_liters:'Liquid chlorine needed',
+        kpi_dh:'Height to add', kpi_dv:'Volume to add',
+        th_item:'Item', th_value:'Value', th_item2:'Item', th_value2:'Value',
+        row_volL:'Pool volume (L)', row_avail:'Available chlorine per liter', row_req:'Total required chlorine',
+        row_dvL:'Volume to add (L)', row_hrs:'Computed hours (if flow given)', row_finish:'Finish time (if flow & start given)',
+        usage_title:'Usage notes', usage_1:'Only the input fields are editable. Results update when you press <strong>Calculate</strong>.', usage_2:'All units are metric (m³, L, m, h). Time displays in your local timezone with a 24‑hour format.', usage_3:'Numbers are rounded for display; underlying calculations keep full precision.',
+        footer:'Made for SRF Park TLV • v1.2 • Single‑file app — ready for GitHub Pages.',
+        calcBtn:'Calculate', toggle:'עברית',
+        notes:{calc:'Calculation complete.', needFields:'Please complete all required fields.', targetLow:'Target is below current. No addition needed.'},
+        level:{needFields:'Enter full volume & full level, then current and target.', noFill:'Target is not above current — no fill volume needed.'}
+      },
+      he: {
+        title: 'SrfparkTLV - כלים ומחשבונים',
+        subtitle: 'שני מחשבונים — מינון כלור ומילוי לפי גובה — פשוט ומותאם לנייד',
+        h2_chlorine: 'חישוב מינון כלור', h2_level: 'מילוי מים לפי גובה',
+        required: 'חובה', optional: 'רשות', defaultNow: 'ברירת מחדל: עכשיו', defaultDensity: 'ברירת מחדל 1.20',
+        lbl_vol: 'נפח בריכה (מ״ק)', lbl_fc_now:'כלור חופשי נוכחי (ppm)', lbl_fc_target:'כלור יעד (ppm)', lbl_cl_percent:'ריכוז כלור (%)', lbl_density:'צפיפות תמיסת כלור (ק"ג/ל׳)',
+        help_vol: 'נפח מים כולל.', how_title:'איך זה עובד', how_help:'Δppm × נפח (ליטר) נותן ק״ג כלור זמין נדרש / 1e6. ליטרים של תמיסה = מסת כלור / (ריכוז × צפיפות).',
+        full_vol:'נפח מלא של הבריכה (מ״ק)', full_level:'גובה מים מלא (מ׳)', now_level:'גובה מים נוכחי (מ׳)', target_level:'גובה מים יעד (מ׳)',
+        optionalTiming:'תזמון אופציונלי (אם רוצים זמן סיום)', flow:'ספיקה (מ״ק/ש׳)', start:'זמן התחלה', round:'עיגול זמן הסיום ל‑',
+        calib_help:'כיול ליניארי: שטח = נפח_מלא / גובה_מלא; ΔV = (יעד − נוכחי) × שטח.',
+        kpi_dppm:'Δppm (יעד − נוכחי)', kpi_liters:'ליטרים נדרשים של כלור',
+        kpi_dh:'גובה להוספה', kpi_dv:'נפח להוספה',
+        th_item:'פריט', th_value:'ערך', th_item2:'פריט', th_value2:'ערך',
+        row_volL:'נפח בריכה (ל׳)', row_avail:'כלור זמין לליטר', row_req:'סה״כ כלור נדרש',
+        row_dvL:'נפח להוספה (ל׳)', row_hrs:'שעות מחושבות (אם ניתנה ספיקה)', row_finish:'זמן סיום (אם ניתנו ספיקה והתחלה)',
+        usage_title:'הנחיות שימוש', usage_1:'רק השדות ניתנים לעריכה. החישוב מתעדכן לאחר לחיצה על <strong>חשב</strong>.', usage_2:'היחידות במטרי (מ״ק, ל׳, מ׳, ש׳). הזמנים מוצגים באזור הזמן המקומי שלך בפורמט 24 שעות.', usage_3:'המספרים מעוגלים לתצוגה; החישוב נשמר בדיוק מלא.',
+        footer:'יוצר עבור SRF Park TLV • v1.2 • קובץ יחיד — מוכן ל‑GitHub Pages.',
+        calcBtn:'חשב', toggle:'English',
+        notes:{calc:'החישוב הושלם.', needFields:'נא למלא את כל שדות החובה.', targetLow:'היעד נמוך מהנוכחי. אין צורך בהוספה.'},
+        level:{needFields:'הזן נפח מלא וגובה מלא, ואז את הגובה הנוכחי והיעד.', noFill:'היעד אינו גבוה מהנוכחי — אין צורך במילוי.'}
       }
-      note.textContent = 'Calculation complete.'; note.className='note ok';
+    };
 
-      const hoursPerTurnover = V / Q; // hours for 1 turnover
-      const runtimeForDesired = Number.isFinite(T) && T>0 ? T * hoursPerTurnover : NaN;
-      const achieved = Number.isFinite(R) && R>0 ? R / hoursPerTurnover : NaN;
+    let currentLang = 'en';
+    function applyLang(){
+      const t = i18n[currentLang];
+      document.documentElement.lang = (currentLang==='he'?'he':'en');
+      document.documentElement.dir = (currentLang==='he'?'rtl':'ltr');
+      document.body.classList.toggle('rtl', currentLang==='he');
 
-      document.getElementById('to_hours_per').textContent = fmt(hoursPerTurnover,2) + ' h';
-      document.getElementById('to_achieved').textContent = isFinite(achieved)? fmt(achieved,2) + ' /day' : '– /day';
-      document.getElementById('to_h_1').textContent = fmt(hoursPerTurnover,2) + ' h';
-      document.getElementById('to_h_2').textContent = fmt(hoursPerTurnover*2,2) + ' h';
-      document.getElementById('to_runtime_needed').textContent = isFinite(runtimeForDesired)? fmt(runtimeForDesired,2) + ' h/day' : '– h/day';
+      const set = (id, html)=>{ const el = document.getElementById(id); if(el) el.innerHTML = html; };
+      set('title', t.title); set('subtitle', t.subtitle);
+      set('h2-chlorine', t.h2_chlorine); set('h2-level', t.h2_level);
+
+      set('lbl-vol', `${t.lbl_vol} <span class="req">${t.required}</span>`);
+      set('lbl-fc-now', `${t.lbl_fc_now} <span class="req">${t.required}</span>`);
+      set('lbl-fc-target', `${t.lbl_fc_target} <span class="req">${t.required}</span>`);
+      set('lbl-cl-percent', `${t.lbl_cl_percent} <span class="req">${t.required}</span>`);
+      set('lbl-density', `${t.lbl_density} <span class="opt">${t.defaultDensity}</span>`);
+      set('help-vol', t.help_vol); set('sum-how', t.how_title); set('help-how', t.how_help);
+
+      set('lbl-full-vol', `${t.full_vol} <span class="req">${t.required}</span>`);
+      set('lbl-full-lvl', `${t.full_level} <span class="req">${t.required}</span>`);
+      set('lbl-now-lvl', `${t.now_level} <span class="req">${t.required}</span>`);
+      set('lbl-target-lvl', `${t.target_level} <span class="req">${t.required}</span>`);
+      set('sum-optional', t.optionalTiming);
+      set('lbl-flow', `${t.flow} <span class="opt">${t.optional}</span>`);
+      set('lbl-start', `${t.start} <span class="opt">${t.defaultNow}</span>`);
+      set('lbl-round', `${t.round} <span class="opt">${t.optional}</span>`);
+      set('help-calib', t.calib_help);
+
+      set('kpi-dppm', t.kpi_dppm); set('kpi-liters', t.kpi_liters);
+      set('kpi-dh', t.kpi_dh); set('kpi-dv', t.kpi_dv);
+
+      set('th-item', t.th_item); set('th-value', t.th_value);
+      set('th-item-2', t.th_item2); set('th-value-2', t.th_value2);
+
+      set('row-volL', t.row_volL); set('row-avail', t.row_avail); set('row-req', t.row_req);
+      set('row-dvL', t.row_dvL); set('row-hrs', t.row_hrs); set('row-finish', t.row_finish);
+
+      set('usage-title', t.usage_title);
+      set('usage-1', t.usage_1); set('usage-2', t.usage_2); set('usage-3', t.usage_3);
+      const foot = document.getElementById('footer-site'); if(foot) foot.textContent = t.footer;
+
+      const b1 = document.getElementById('btn-calc-1'); if(b1) b1.textContent = t.calcBtn;
+      const b2 = document.getElementById('btn-calc-2'); if(b2) b2.textContent = t.calcBtn;
+
+      const toggleBtn = document.getElementById('lang-toggle'); if(toggleBtn) toggleBtn.textContent = t.toggle;
+
+      // Refresh note texts if already visible
+      const cNote = document.getElementById('chlorine-note'); if(cNote){ if(cNote.classList.contains('err')) cNote.textContent = t.notes.needFields; else if(cNote.classList.contains('warn')) cNote.textContent = t.notes.targetLow; else cNote.textContent = t.notes.calc; }
+      const lNote = document.getElementById('level-note'); if(lNote){ if(lNote.classList.contains('err')) lNote.textContent = i18n[currentLang].level.needFields; else if(lNote.classList.contains('warn')) lNote.textContent = i18n[currentLang].level.noFill; else lNote.textContent = t.notes.calc; }
     }
 
-    // Sensible defaults to demo quickly
+    const toggle = document.getElementById('lang-toggle');
+    if(toggle){ toggle.addEventListener('click', ()=>{ currentLang = (currentLang==='en'?'he':'en'); applyLang(); localStorage.setItem('srf_calc_lang', currentLang); }); }
+
+    // Load preferred language
+    let saved = localStorage.getItem('srf_calc_lang');
+    if(saved === 'he' || saved === 'en') currentLang = saved;
+    applyLang();
+
+    // Prefill a couple of examples
     window.addEventListener('DOMContentLoaded', ()=>{
-      // prefill some example values for quick testing
       document.getElementById('fc_now').value = '0.2';
       document.getElementById('fc_target').value = '0.8';
-      document.getElementById('flow_m3h').value = '99';
-      document.getElementById('delta_m3').value = '120';
-      document.getElementById('to_vol_m3').value = '29000';
-      document.getElementById('to_flow_m3h').value = '99';
-      document.getElementById('to_turnovers').value = '1.2';
-      document.getElementById('to_runtime_h').value = '20';
+      document.getElementById('level_now_m').value = '';
+      document.getElementById('level_target_m').value = '';
     });
   </script>
 </body>
