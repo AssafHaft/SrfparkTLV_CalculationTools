@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>pool-srf-park-tlv-pool-calculations</title>
+  <meta name="description" content="Mobile-friendly pool calculators for SRF Park TLV: chlorine dosing, fill & flow timing, and turnover planning." />
+  <style>
+    :root{
+      --bg: #0b1320;        /* deep navy */
+      --card:#111a2b;       /* card base */
+      --ink:#ecf1ff;        /* text */
+      --muted:#a8b3d1;      /* secondary text */
+      --accent:#3ea6ff;     /* focus/cta */
+      --good:#5bd165;       /* success */
+      --warn:#ffcc66;       /* warn */
+      --bad:#ff6b6b;        /* error */
+      --line:#1f2b44;       /* dividers */
+      --shadow: 0 6px 20px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 15% -10%, #14213d 0%, transparent 60%),
+                  radial-gradient(1000px 500px at 95% 10%, #12243b 0%, transparent 60%),
+                  var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
+    header{
+      position: sticky; top:0; z-index: 5;
+      backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(11,19,32,.85), rgba(11,19,32,.65));
+      border-bottom: 1px solid var(--line);
+    }
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 18px 16px; }
+    h1{ font-size: clamp(22px, 3.6vw, 34px); margin:0; letter-spacing:.2px; }
+    .sub{ color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+    main{ padding: 20px 16px 60px; }
+    .grid{ display:grid; gap: 18px; grid-template-columns: 1fr; }
+    @media (min-width: 880px){ .grid{ grid-template-columns: repeat(3, 1fr); } }
+
+    .card{
+      background: linear-gradient(180deg, rgba(17,26,43,.85), rgba(17,26,43,.75));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column;
+      min-height: 420px;
+    }
+    .card h2{ font-size: 18px; margin: 0; padding: 16px; border-bottom: 1px solid var(--line); }
+    .card .body{ padding: 14px 16px 16px; display:grid; gap:12px; }
+
+    form{ display:grid; gap:10px; }
+    .row{ display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:end; }
+    .label{ font-size: 12px; color: var(--muted); margin-bottom: 4px; display:flex; align-items:center; gap:8px; }
+    .req{ font-size: 10px; color: var(--bg); background: var(--accent); padding: 2px 6px; border-radius: 999px; }
+    .opt{ font-size: 10px; color: var(--ink); background: #26324d; padding: 2px 6px; border-radius: 999px; }
+    .help{ font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    input, select{ width:100%; padding: 10px 12px; border: 1px solid var(--line); background:#0f1726; color: var(--ink); border-radius: 12px; font-size:14px; }
+    input[readonly]{ background:#0b1320; opacity:.9; }
+    input:focus{ outline: 2px solid transparent; box-shadow: 0 0 0 2px var(--accent); }
+
+    .kpi{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .kpi .box{ background:#0b1320; border:1px solid var(--line); border-radius: 14px; padding:12px; }
+    .kpi .t{ font-size: 11px; color: var(--muted); }
+    .kpi .v{ font-size: 20px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+
+    .footer{
+      margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:8px; padding: 12px 16px; border-top:1px solid var(--line);
+    }
+    .btn{ border:1px solid var(--line); background:#0f1a2b; color:var(--ink); padding: 10px 12px; border-radius: 12px; font-weight:600; cursor:pointer; }
+    .btn.primary{ background: linear-gradient(180deg,#3ea6ff,#2680d9); border-color: #1d5fb1; color:#061427; }
+
+    .note{ font-size: 11px; color: var(--muted); }
+    .ok{ color: var(--good); }
+    .warn{ color: var(--warn); }
+    .err{ color: var(--bad); }
+
+    .table{ width:100%; border-collapse: collapse; font-size: 13px; }
+    .table th,.table td{ border-bottom: 1px dashed var(--line); padding: 6px 4px; text-align:left; }
+    .table th{ color: var(--muted); font-weight:600; }
+
+    .seg{ margin-top:4px; padding-top:10px; border-top:1px dashed var(--line); }
+    details{ background:#0b1320; border:1px solid var(--line); border-radius:12px; padding:8px 10px; }
+    summary{ cursor:pointer; color:var(--muted); }
+
+    footer.site{ text-align:center; color:var(--muted); font-size:12px; padding:24px 10px 40px; }
+    a, a:visited{ color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>pool-srf-park-tlv-pool-calculations</h1>
+      <div class="sub">Chlorine dosing • Fill & flow timing • Turnover planner — mobile-first, clear required inputs only</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+
+      <!-- 1) Chlorine Dose Calculator -->
+      <section class="card" id="chlorine-card">
+        <h2>Chlorine Dose</h2>
+        <div class="body">
+          <form id="chlorine-form">
+            <div>
+              <label class="label">Pool volume (m³) <span class="req">Required</span></label>
+              <input type="number" id="vol_m3" min="0" step="0.01" value="29000" required />
+              <div class="help">Total water volume.</div>
+            </div>
+            <div class="row">
+              <div>
+                <label class="label">Current FC (ppm) <span class="req">Required</span></label>
+                <input type="number" id="fc_now" min="0" step="0.01" placeholder="e.g., 0.2" required />
+              </div>
+              <div>
+                <label class="label">Target FC (ppm) <span class="req">Required</span></label>
+                <input type="number" id="fc_target" min="0" step="0.01" placeholder="e.g., 0.8" required />
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label class="label">Chlorine concentration (%) <span class="req">Required</span></label>
+                <input type="number" id="cl_percent" min="1" max="20" step="0.1" value="12" required />
+              </div>
+              <div>
+                <label class="label">Bleach density (kg/L) <span class="opt">Default 1.20</span></label>
+                <input type="number" id="bleach_density" min="1.00" max="1.30" step="0.01" value="1.20" />
+              </div>
+            </div>
+
+            <details class="seg">
+              <summary>How this works</summary>
+              <div class="help">Δppm × volume(L) gives mg of available chlorine required. Liters of liquid = required_mass / (concentration × density).</div>
+            </details>
+          </form>
+
+          <div class="kpi">
+            <div class="box">
+              <div class="t">Δppm (target − current)</div>
+              <div class="v" id="delta_ppm">–</div>
+            </div>
+            <div class="box">
+              <div class="t">Liquid chlorine needed</div>
+              <div class="v" id="liters_needed">– L</div>
+            </div>
+          </div>
+
+          <table class="table seg">
+            <thead><tr><th>Item</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td>Pool volume (L)</td><td id="vol_l">–</td></tr>
+              <tr><td>Available chlorine per liter</td><td id="avail_per_L">– kg/L</td></tr>
+              <tr><td>Total required chlorine</td><td id="req_chlorine">– kg</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <button class="btn primary" onclick="calcChlorine()">Calculate</button>
+          <div class="note" id="chlorine-note">Fill required fields, then Calculate.</div>
+        </div>
+      </section>
+
+      <!-- 2) Fill / Flow Timing -->
+      <section class="card" id="fill-card">
+        <h2>Fill & Flow Timing</h2>
+        <div class="body">
+          <form id="fill-form">
+            <div>
+              <label class="label">Flow rate (m³/h) <span class="req">Required</span></label>
+              <input type="number" id="flow_m3h" min="0" step="0.01" placeholder="e.g., 99" required />
+              <div class="help">Average effective fill rate.</div>
+            </div>
+            <div class="row">
+              <div>
+                <label class="label">Current volume (m³) <span class="opt">Optional</span></label>
+                <input type="number" id="cur_vol_m3" min="0" step="0.01" />
+              </div>
+              <div>
+                <label class="label">Target volume (m³) <span class="opt">Optional</span></label>
+                <input type="number" id="tgt_vol_m3" min="0" step="0.01" />
+              </div>
+            </div>
+            <div>
+              <div class="label">OR provide Volume to add (m³) <span class="req">Required if no target volume</span></div>
+              <input type="number" id="delta_m3" min="0" step="0.01" placeholder="e.g., 120" />
+              <div class="help">If you enter both current & target, this will be auto-calculated.</div>
+            </div>
+            <div class="row">
+              <div>
+                <label class="label">Start time <span class="opt">Default: now</span></label>
+                <input type="datetime-local" id="start_time" />
+              </div>
+              <div>
+                <label class="label">Round result to <span class="opt">Optional</span></label>
+                <select id="round_to">
+                  <option value="1">1 min</option>
+                  <option value="5" selected>5 min</option>
+                  <option value="10">10 min</option>
+                  <option value="15">15 min</option>
+                </select>
+              </div>
+            </div>
+          </form>
+
+          <div class="kpi">
+            <div class="box">
+              <div class="t">Duration</div>
+              <div class="v" id="fill_duration">–</div>
+            </div>
+            <div class="box">
+              <div class="t">Finish time</div>
+              <div class="v" id="finish_time">–</div>
+            </div>
+          </div>
+
+          <table class="table seg">
+            <thead><tr><th>Item</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td>Volume to add (m³)</td><td id="delta_m3_out">–</td></tr>
+              <tr><td>Flow rate (m³/h)</td><td id="flow_out">–</td></tr>
+              <tr><td>Computed hours</td><td id="hours_out">– h</td></tr>
+            </tbody>
+          </table>
+
+        </div>
+        <div class="footer">
+          <button class="btn primary" onclick="calcFill()">Calculate</button>
+          <div class="note" id="fill-note">Provide flow & either (current + target) or (volume to add).</div>
+        </div>
+      </section>
+
+      <!-- 3) Turnover & Circulation Planner -->
+      <section class="card" id="turnover-card">
+        <h2>Turnover & Circulation</h2>
+        <div class="body">
+          <form id="turnover-form">
+            <div>
+              <label class="label">Pool volume (m³) <span class="req">Required</span></label>
+              <input type="number" id="to_vol_m3" min="0" step="0.01" placeholder="e.g., 29000" required />
+            </div>
+            <div>
+              <label class="label">Flow rate (m³/h) <span class="req">Required</span></label>
+              <input type="number" id="to_flow_m3h" min="0" step="0.01" placeholder="e.g., 99" required />
+            </div>
+            <div class="row">
+              <div>
+                <label class="label">Desired turnovers / day <span class="opt">Optional</span></label>
+                <input type="number" id="to_turnovers" min="0" step="0.1" placeholder="e.g., 1.5" />
+              </div>
+              <div>
+                <label class="label">Planned runtime (h/day) <span class="opt">Optional</span></label>
+                <input type="number" id="to_runtime_h" min="0" step="0.1" placeholder="e.g., 20" />
+              </div>
+            </div>
+          </form>
+
+          <div class="kpi">
+            <div class="box">
+              <div class="t">Hours per turnover</div>
+              <div class="v" id="to_hours_per">– h</div>
+            </div>
+            <div class="box">
+              <div class="t">Turnovers @ runtime</div>
+              <div class="v" id="to_achieved">– /day</div>
+            </div>
+          </div>
+
+          <table class="table seg">
+            <thead><tr><th>Plan</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td>Hours to 1 turnover</td><td id="to_h_1">– h</td></tr>
+              <tr><td>Hours to 2 turnovers</td><td id="to_h_2">– h</td></tr>
+              <tr><td>Runtime for desired turnovers</td><td id="to_runtime_needed">– h/day</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <button class="btn primary" onclick="calcTurnover()">Calculate</button>
+          <div class="note" id="turnover-note">Enter volume & flow. Add a target or runtime for more detail.</div>
+        </div>
+      </section>
+
+    </div>
+
+    <section class="seg" style="margin-top:24px;">
+      <h3 style="margin:0 0 8px 0; font-size:16px;">Usage notes</h3>
+      <ul style="margin:8px 0 0 18px; line-height:1.6; color:var(--muted);">
+        <li>Only the inputs are editable. Results update when you press <strong>Calculate</strong>.</li>
+        <li>All units are metric (m³, L, h). Time displays in your local timezone with a 24‑hour format.</li>
+        <li>Numbers are rounded for display; underlying calculations keep full precision.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site">
+    Made for SRF Park TLV • v1.0 • Single‑file app — ready for GitHub Pages.
+  </footer>
+
+  <script>
+    function fmt(n, digits=2){
+      if(Number.isNaN(+n)) return '–';
+      return (+n).toLocaleString(undefined,{maximumFractionDigits:digits, minimumFractionDigits:0});
+    }
+    function roundToMinutes(date, minutes){
+      const ms = minutes*60*1000; return new Date(Math.round(date.getTime()/ms)*ms);
+    }
+
+    // 1) Chlorine Dose
+    function calcChlorine(){
+      const V = parseFloat(document.getElementById('vol_m3').value);
+      const fcNow = parseFloat(document.getElementById('fc_now').value);
+      const fcTgt = parseFloat(document.getElementById('fc_target').value);
+      const pct = parseFloat(document.getElementById('cl_percent').value);
+      const rho = parseFloat(document.getElementById('bleach_density').value || '1.2');
+
+      const note = document.getElementById('chlorine-note');
+      if([V,fcNow,fcTgt,pct,rho].some(x=>Number.isNaN(x))){ note.textContent = 'Please complete all required fields.'; note.className='note err'; return; }
+      if(fcTgt < fcNow){ note.textContent = 'Target is below current. No addition needed.'; note.className='note warn'; }
+      else { note.textContent = 'Calculation complete.'; note.className='note ok'; }
+
+      const volL = V * 1000; // liters
+      const dppm = Math.max(0, fcTgt - fcNow); // mg/L
+      const req_kg = dppm * volL / 1e6; // kg of available chlorine
+      const avail_per_L = (pct/100) * rho; // kg available per liter of liquid
+      const liters = avail_per_L>0 ? req_kg / avail_per_L : NaN;
+
+      document.getElementById('delta_ppm').textContent = fmt(dppm,3);
+      document.getElementById('liters_needed').textContent = isFinite(liters)? `${fmt(liters,2)} L` : '– L';
+      document.getElementById('vol_l').textContent = fmt(volL,0) + ' L';
+      document.getElementById('avail_per_L').textContent = isFinite(avail_per_L)? `${fmt(avail_per_L,3)} kg/L` : '–';
+      document.getElementById('req_chlorine').textContent = isFinite(req_kg)? `${fmt(req_kg,3)} kg` : '–';
+    }
+
+    // 2) Fill & Flow Timing
+    function calcFill(){
+      const flow = parseFloat(document.getElementById('flow_m3h').value);
+      const curV = parseFloat(document.getElementById('cur_vol_m3').value);
+      const tgtV = parseFloat(document.getElementById('tgt_vol_m3').value);
+      let dV = parseFloat(document.getElementById('delta_m3').value);
+      const roundMin = parseInt(document.getElementById('round_to').value,10) || 5;
+
+      const note = document.getElementById('fill-note');
+      if(Number.isFinite(curV) && Number.isFinite(tgtV)){
+        dV = Math.max(0, tgtV - curV);
+        document.getElementById('delta_m3').value = dV ? dV.toFixed(2) : '';
+      }
+      if(Number.isNaN(flow) || (!Number.isFinite(dV) || dV<=0)){
+        note.textContent = 'Need flow and a positive volume to add.'; note.className='note err';
+        document.getElementById('delta_m3_out').textContent = '–';
+        document.getElementById('flow_out').textContent = '–';
+        document.getElementById('hours_out').textContent = '– h';
+        document.getElementById('fill_duration').textContent = '–';
+        document.getElementById('finish_time').textContent = '–';
+        return;
+      }
+      note.textContent = 'Calculation complete.'; note.className='note ok';
+
+      const hours = dV / flow; // hours
+      const mins = hours * 60;
+
+      // Start time: default now in local tz
+      let startStr = document.getElementById('start_time').value;
+      let start = startStr ? new Date(startStr) : new Date();
+      const finish = new Date(start.getTime() + mins*60*1000);
+
+      // Round finish to desired minute grid for easy planning
+      const finishRounded = roundToMinutes(finish, roundMin);
+      const totalMinsRounded = (finishRounded - start) / (60*1000);
+      const h = Math.floor(totalMinsRounded/60), m = Math.round(totalMinsRounded%60);
+
+      document.getElementById('delta_m3_out').textContent = fmt(dV,2);
+      document.getElementById('flow_out').textContent = fmt(flow,2);
+      document.getElementById('hours_out').textContent = fmt(hours,3) + ' h';
+      document.getElementById('fill_duration').textContent = `${h}h ${m}m`;
+      document.getElementById('finish_time').textContent = finishRounded.toLocaleString([], {hour12:false});
+    }
+
+    // 3) Turnover & Circulation
+    function calcTurnover(){
+      const V = parseFloat(document.getElementById('to_vol_m3').value);
+      const Q = parseFloat(document.getElementById('to_flow_m3h').value);
+      const T = parseFloat(document.getElementById('to_turnovers').value);
+      const R = parseFloat(document.getElementById('to_runtime_h').value);
+      const note = document.getElementById('turnover-note');
+
+      if([V,Q].some(x=>Number.isNaN(x) || x<=0)){
+        note.textContent = 'Enter positive volume and flow.'; note.className='note err';
+        document.getElementById('to_hours_per').textContent = '– h';
+        document.getElementById('to_achieved').textContent = '– /day';
+        document.getElementById('to_h_1').textContent = '– h';
+        document.getElementById('to_h_2').textContent = '– h';
+        document.getElementById('to_runtime_needed').textContent = '– h/day';
+        return;
+      }
+      note.textContent = 'Calculation complete.'; note.className='note ok';
+
+      const hoursPerTurnover = V / Q; // hours for 1 turnover
+      const runtimeForDesired = Number.isFinite(T) && T>0 ? T * hoursPerTurnover : NaN;
+      const achieved = Number.isFinite(R) && R>0 ? R / hoursPerTurnover : NaN;
+
+      document.getElementById('to_hours_per').textContent = fmt(hoursPerTurnover,2) + ' h';
+      document.getElementById('to_achieved').textContent = isFinite(achieved)? fmt(achieved,2) + ' /day' : '– /day';
+      document.getElementById('to_h_1').textContent = fmt(hoursPerTurnover,2) + ' h';
+      document.getElementById('to_h_2').textContent = fmt(hoursPerTurnover*2,2) + ' h';
+      document.getElementById('to_runtime_needed').textContent = isFinite(runtimeForDesired)? fmt(runtimeForDesired,2) + ' h/day' : '– h/day';
+    }
+
+    // Sensible defaults to demo quickly
+    window.addEventListener('DOMContentLoaded', ()=>{
+      // prefill some example values for quick testing
+      document.getElementById('fc_now').value = '0.2';
+      document.getElementById('fc_target').value = '0.8';
+      document.getElementById('flow_m3h').value = '99';
+      document.getElementById('delta_m3').value = '120';
+      document.getElementById('to_vol_m3').value = '29000';
+      document.getElementById('to_flow_m3h').value = '99';
+      document.getElementById('to_turnovers').value = '1.2';
+      document.getElementById('to_runtime_h').value = '20';
+    });
+  </script>
+</body>
+</html>
