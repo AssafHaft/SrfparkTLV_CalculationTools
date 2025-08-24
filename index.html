@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SrfparkTLV - Tools & Calculators</title>
-  <meta name="description" content="Mobile-friendly pool calculators for SRF Park TLV: chlorine dosing and water fill by level with full-volume calibration." />
+  <title>SrfparkTLV - Tools</title>
+  <meta name="description" content="Mobile-friendly pool calculators for SRF Park TLV: chlorine dosing and water fill by level (surface area or calibrated)." />
   <style>
     :root{ --bg:#0b1320; --card:#111a2b; --ink:#ecf1ff; --muted:#a8b3d1; --accent:#3ea6ff; --line:#1f2b44; --good:#5bd165; --warn:#ffcc66; --bad:#ff6b6b; --shadow:0 6px 20px rgba(0,0,0,.35); --radius:18px; }
     *{box-sizing:border-box}
@@ -14,7 +14,7 @@
     .wrap{max-width:980px;margin:0 auto;padding:18px 16px;position:relative}
     h1{margin:0;font-size:clamp(22px,3.4vw,34px)}
     .sub{color:var(--muted);font-size:13px;margin-top:6px}
-    .lang-toggle{position:absolute;right:16px;top:16px}
+    .lang-toggle{position:absolute;top:16px;right:16px} [dir="rtl"] .lang-toggle{left:16px;right:auto}
     main{padding:20px 16px 60px}
     .grid{display:grid;gap:18px;grid-template-columns:1fr}
     @media(min-width:880px){.grid{grid-template-columns:repeat(2,1fr)}}
@@ -44,13 +44,16 @@
     .table th{color:var(--muted);font-weight:600}
     .seg{margin-top:4px;padding-top:10px;border-top:1px dashed var(--line)}
     .rtl{direction:rtl}
+    .method{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{padding:8px 10px;border:1px solid var(--line);border-radius:999px;cursor:pointer;background:#0f1a2b}
+    .pill.active{background:linear-gradient(180deg,#3ea6ff,#2680d9);color:#061427;border-color:#1d5fb1}
     footer.site{text-align:center;color:var(--muted);font-size:12px;padding:24px 10px 40px}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
-      <h1 id="title">SrfparkTLV - Tools & Calculators</h1>
+      <h1 id="title">SrfparkTLV - Tools</h1>
       <div class="sub" id="subtitle">Two calculators — Chlorine dosing & Water fill by level — mobile-first and simple</div>
       <button id="lang-toggle" class="btn lang-toggle" type="button">עברית</button>
     </div>
@@ -85,8 +88,8 @@
                 <input type="number" id="cl_percent" min="1" max="20" step="0.1" value="12" required />
               </div>
               <div>
-                <label class="label" id="lbl-density">Bleach density (kg/L) <span class="opt" id="opt-density">Default 1.20</span></label>
-                <input type="number" id="bleach_density" min="1.00" max="1.30" step="0.01" value="1.170" />
+                <label class="label" id="lbl-density">Bleach density (kg/L) <span class="opt" id="opt-density">Default 1.17</span></label>
+                <input type="number" id="bleach_density" min="1.00" max="1.30" step="0.01" value="1.17" />
               </div>
             </div>
             <details class="seg">
@@ -121,21 +124,39 @@
         </div>
       </section>
 
-      <!-- 2) Water Fill by Level (Calibrated by Full Volume & Full Level) -->
+      <!-- 2) Water Fill by Level -->
       <section class="card" id="level-card">
         <h2 id="h2-level">Water Fill by Level</h2>
         <div class="body">
+          <div class="method" id="method-pills">
+            <span class="pill active" data-method="area" id="pill-area">Use surface area (m²)</span>
+            <span class="pill" data-method="calib" id="pill-calib">Use full volume & level</span>
+          </div>
           <form id="level-form">
-            <div class="row">
+            <!-- Method: AREA -->
+            <div id="area-set">
               <div>
-                <label class="label" id="lbl-full-vol">Full pool volume (m³) <span class="req">Required</span></label>
-                <input type="number" id="full_vol_m3" min="0" step="0.01" value="29000" required />
-              </div>
-              <div>
-                <label class="label" id="lbl-full-lvl">Full water level height (m) <span class="req">Required</span></label>
-                <input type="number" id="full_level_m" min="0" step="0.001" value="2.88" required />
+                <label class="label" id="lbl-surface">Surface area (m²) <span class="req">Required</span></label>
+                <input type="number" id="surface_m2" min="0" step="0.01" placeholder="e.g., 12000" />
+                <div class="help" id="help-surface">Horizontal water surface area of the pool/lagoon.</div>
               </div>
             </div>
+
+            <!-- Method: CALIBRATION (hidden by default) -->
+            <div id="calib-set" style="display:none;">
+              <div class="row">
+                <div>
+                  <label class="label" id="lbl-full-vol">Full pool volume (m³) <span class="req">Required</span></label>
+                  <input type="number" id="full_vol_m3" min="0" step="0.01" value="29000" />
+                </div>
+                <div>
+                  <label class="label" id="lbl-full-lvl">Full water level height (m) <span class="req">Required</span></label>
+                  <input type="number" id="full_level_m" min="0" step="0.001" value="2.88" />
+                </div>
+              </div>
+              <div class="help" id="help-calib">Using a linear calibration: area = full_volume / full_level; ΔV = (target − current) × area.</div>
+            </div>
+
             <div class="row">
               <div>
                 <label class="label" id="lbl-now-lvl">Current water level (m) <span class="req">Required</span></label>
@@ -146,6 +167,7 @@
                 <input type="number" id="level_target_m" min="-10" step="0.001" placeholder="e.g., 1.45" required />
               </div>
             </div>
+
             <details class="seg">
               <summary id="sum-optional">Optional timing (if you want finish time)</summary>
               <div class="row">
@@ -168,7 +190,6 @@
                 </select>
               </div>
             </details>
-            <div class="help" id="help-calib">Using a linear calibration: area = full_volume / full_level; ΔV = (target − current) × area.</div>
           </form>
 
           <div class="kpi">
@@ -193,7 +214,7 @@
         </div>
         <div class="footer">
           <button class="btn primary" id="btn-calc-2" onclick="calcLevel()">Calculate</button>
-          <div class="note" id="level-note">Enter full volume & full level, then current and target. Optional: flow & start.</div>
+          <div class="note" id="level-note">Choose method, enter area OR full volume & level, then current and target. Optional: flow & start.</div>
         </div>
       </section>
 
@@ -210,7 +231,7 @@
   </main>
 
   <footer class="site" id="footer-site">
-    Made for SRF Park TLV • v1.2 • Single‑file app — ready for GitHub Pages.
+    Made for SRF Park TLV • v1.3 • Single‑file app — ready for GitHub Pages.
   </footer>
 
   <script>
@@ -223,7 +244,7 @@
       const fcNow = parseFloat(document.getElementById('fc_now').value);
       const fcTgt = parseFloat(document.getElementById('fc_target').value);
       const pct = parseFloat(document.getElementById('cl_percent').value);
-      const rho = parseFloat(document.getElementById('bleach_density').value || '1.2');
+      const rho = parseFloat(document.getElementById('bleach_density').value || '1.17'); // default density
       const note = document.getElementById('chlorine-note');
 
       if([V,fcNow,fcTgt,pct,rho].some(x=>Number.isNaN(x))){ note.textContent = currentLang==='he'? i18n.he.notes.needFields : i18n.en.notes.needFields; note.className='note err'; return; }
@@ -242,10 +263,28 @@
       document.getElementById('req_chlorine').textContent = isFinite(req_kg)? `${fmt(req_kg,3)} kg` : '–';
     }
 
-    // 2) Water Fill by Level (calibrated)
+    // Method UI switching
+    let method = 'area';
+    const pills = document.getElementById('method-pills');
+    function setMethod(m){
+      method = m;
+      document.getElementById('area-set').style.display = (m==='area')? 'block':'none';
+      document.getElementById('calib-set').style.display = (m==='calib')? 'block':'none';
+      // pill styles
+      Array.from(pills.querySelectorAll('.pill')).forEach(p=> p.classList.toggle('active', p.dataset.method===m));
+      // update helper text in note
+      const note = document.getElementById('level-note');
+      if(m==='area') note.textContent = currentLang==='he'? i18n.he.level.noteArea : i18n.en.level.noteArea;
+      else note.textContent = currentLang==='he'? i18n.he.level.noteCalib : i18n.en.level.noteCalib;
+    }
+    if(pills){
+      pills.addEventListener('click', (e)=>{
+        const t = e.target.closest('.pill'); if(!t) return; setMethod(t.dataset.method);
+      });
+    }
+
+    // 2) Water Fill by Level (area OR calibrated)
     function calcLevel(){
-      const Vfull = parseFloat(document.getElementById('full_vol_m3').value); // m3
-      const Hfull = parseFloat(document.getElementById('full_level_m').value); // m
       const Hn = parseFloat(document.getElementById('level_now_m').value); // m
       const Ht = parseFloat(document.getElementById('level_target_m').value); // m
       const Q = parseFloat(document.getElementById('flow_m3h').value); // m3/h (optional)
@@ -253,10 +292,19 @@
       const roundMin = parseInt(document.getElementById('round_to').value,10) || 5;
       const note = document.getElementById('level-note');
 
-      if([Vfull,Hfull,Hn,Ht].some(x=>Number.isNaN(x)) || Hfull<=0){
-        note.textContent = currentLang==='he'? i18n.he.level.needFields : i18n.en.level.needFields; note.className='note err'; return; }
+      if([Hn,Ht].some(x=>Number.isNaN(x))){ note.textContent = i18n[currentLang].level.needLevels; note.className='note err'; return; }
 
-      const A = Vfull / Hfull; // m2 (effective surface area assuming linear relationship)
+      let A = NaN; // effective area m2
+      if(method==='area'){
+        A = parseFloat(document.getElementById('surface_m2').value);
+        if(Number.isNaN(A) || A<=0){ note.textContent = i18n[currentLang].level.needArea; note.className='note err'; return; }
+      } else {
+        const Vfull = parseFloat(document.getElementById('full_vol_m3').value);
+        const Hfull = parseFloat(document.getElementById('full_level_m').value);
+        if([Vfull,Hfull].some(x=>Number.isNaN(x)) || Hfull<=0){ note.textContent = i18n[currentLang].level.needCalib; note.className='note err'; return; }
+        A = Vfull / Hfull;
+      }
+
       const dH = Math.max(0, Ht - Hn); // m
       const dV = dH * A; // m3
       const dVL = dV * 1000; // L
@@ -277,19 +325,21 @@
         document.getElementById('finish_time').textContent = '–';
       }
 
-      if(dV>0){ note.textContent = currentLang==='he'? i18n.he.notes.calc : i18n.en.notes.calc; note.className='note ok'; }
-      else { note.textContent = currentLang==='he'? i18n.he.level.noFill : i18n.en.level.noFill; note.className='note warn'; }
+      if(dV>0){ note.textContent = i18n[currentLang].notes.calc; note.className='note ok'; }
+      else { note.textContent = i18n[currentLang].level.noFill; note.className='note warn'; }
     }
 
     // Language toggle & i18n
     const i18n = {
       en: {
-        title: 'SrfparkTLV - Tools & Calculators',
+        title: 'SrfparkTLV - Tools',
         subtitle: 'Two calculators — Chlorine dosing & Water fill by level — mobile-first and simple',
         h2_chlorine: 'Chlorine Dose', h2_level: 'Water Fill by Level',
-        required: 'Required', optional: 'Optional', defaultNow: 'Default: now', defaultDensity: 'Default 1.170',
+        required: 'Required', optional: 'Optional', defaultNow: 'Default: now', defaultDensity: 'Default 1.17',
         lbl_vol: 'Pool volume (m³)', lbl_fc_now:'Current FC (ppm)', lbl_fc_target:'Target FC (ppm)', lbl_cl_percent:'Chlorine concentration (%)', lbl_density:'Bleach density (kg/L)',
         help_vol: 'Total water volume.', how_title:'How this works', how_help:'Δppm × volume(L) gives kg of available chlorine required / 1e6. Liters of liquid = required_mass / (concentration × density).',
+        h2_level_method_area:'Use surface area (m²)', h2_level_method_calib:'Use full volume & level',
+        surface:'Surface area (m²)', help_surface:'Horizontal water surface area of the pool/lagoon.',
         full_vol:'Full pool volume (m³)', full_level:'Full water level height (m)', now_level:'Current water level (m)', target_level:'Target water level (m)',
         optionalTiming:'Optional timing (if you want finish time)', flow:'Fill flow rate (m³/h)', start:'Start time', round:'Round finish to',
         calib_help:'Using a linear calibration: area = full_volume / full_level; ΔV = (target − current) × area.',
@@ -299,18 +349,20 @@
         row_volL:'Pool volume (L)', row_avail:'Available chlorine per liter', row_req:'Total required chlorine',
         row_dvL:'Volume to add (L)', row_hrs:'Computed hours (if flow given)', row_finish:'Finish time (if flow & start given)',
         usage_title:'Usage notes', usage_1:'Only the input fields are editable. Results update when you press <strong>Calculate</strong>.', usage_2:'All units are metric (m³, L, m, h). Time displays in your local timezone with a 24‑hour format.', usage_3:'Numbers are rounded for display; underlying calculations keep full precision.',
-        footer:'Made for SRF Park TLV • v1.2 • Single‑file app — ready for GitHub Pages.',
+        footer:'Made for SRF Park TLV • v1.3 • Single‑file app — ready for GitHub Pages.',
         calcBtn:'Calculate', toggle:'עברית',
         notes:{calc:'Calculation complete.', needFields:'Please complete all required fields.', targetLow:'Target is below current. No addition needed.'},
-        level:{needFields:'Enter full volume & full level, then current and target.', noFill:'Target is not above current — no fill volume needed.'}
+        level:{needLevels:'Enter current and target levels.', needArea:'Enter a valid surface area in m².', needCalib:'Enter full volume and full level.', noFill:'Target is not above current — no fill volume needed.', noteArea:'Enter area + levels (optional: flow & start).', noteCalib:'Enter full volume & full level + levels.'}
       },
       he: {
-        title: 'SrfparkTLV - כלים ומחשבונים',
+        title: 'כלים עבור סרף פארק תל אביב',
         subtitle: 'שני מחשבונים — מינון כלור ומילוי לפי גובה — פשוט ומותאם לנייד',
         h2_chlorine: 'חישוב מינון כלור', h2_level: 'מילוי מים לפי גובה',
-        required: 'חובה', optional: 'רשות', defaultNow: 'ברירת מחדל: עכשיו', defaultDensity: 'ברירת מחדל 1.20',
+        required: 'חובה', optional: 'רשות', defaultNow: 'ברירת מחדל: עכשיו', defaultDensity: 'ברירת מחדל 1.17',
         lbl_vol: 'נפח בריכה (מ״ק)', lbl_fc_now:'כלור חופשי נוכחי (ppm)', lbl_fc_target:'כלור יעד (ppm)', lbl_cl_percent:'ריכוז כלור (%)', lbl_density:'צפיפות תמיסת כלור (ק"ג/ל׳)',
         help_vol: 'נפח מים כולל.', how_title:'איך זה עובד', how_help:'Δppm × נפח (ליטר) נותן ק״ג כלור זמין נדרש / 1e6. ליטרים של תמיסה = מסת כלור / (ריכוז × צפיפות).',
+        h2_level_method_area:'שימוש בשטח פני מים (מ״ר)', h2_level_method_calib:'שימוש בנפח מלא וגובה מלא',
+        surface:'שטח פני מים (מ״ר)', help_surface:'שטח אופקי של פני המים בלגונה/בריכה.',
         full_vol:'נפח מלא של הבריכה (מ״ק)', full_level:'גובה מים מלא (מ׳)', now_level:'גובה מים נוכחי (מ׳)', target_level:'גובה מים יעד (מ׳)',
         optionalTiming:'תזמון אופציונלי (אם רוצים זמן סיום)', flow:'ספיקה (מ״ק/ש׳)', start:'זמן התחלה', round:'עיגול זמן הסיום ל‑',
         calib_help:'כיול ליניארי: שטח = נפח_מלא / גובה_מלא; ΔV = (יעד − נוכחי) × שטח.',
@@ -320,14 +372,14 @@
         row_volL:'נפח בריכה (ל׳)', row_avail:'כלור זמין לליטר', row_req:'סה״כ כלור נדרש',
         row_dvL:'נפח להוספה (ל׳)', row_hrs:'שעות מחושבות (אם ניתנה ספיקה)', row_finish:'זמן סיום (אם ניתנו ספיקה והתחלה)',
         usage_title:'הנחיות שימוש', usage_1:'רק השדות ניתנים לעריכה. החישוב מתעדכן לאחר לחיצה על <strong>חשב</strong>.', usage_2:'היחידות במטרי (מ״ק, ל׳, מ׳, ש׳). הזמנים מוצגים באזור הזמן המקומי שלך בפורמט 24 שעות.', usage_3:'המספרים מעוגלים לתצוגה; החישוב נשמר בדיוק מלא.',
-        footer:'יוצר עבור SRF Park TLV • v1.2 • קובץ יחיד — מוכן ל‑GitHub Pages.',
+        footer:'יוצר עבור SRF Park TLV • v1.3 • קובץ יחיד — מוכן ל‑GitHub Pages.',
         calcBtn:'חשב', toggle:'English',
         notes:{calc:'החישוב הושלם.', needFields:'נא למלא את כל שדות החובה.', targetLow:'היעד נמוך מהנוכחי. אין צורך בהוספה.'},
-        level:{needFields:'הזן נפח מלא וגובה מלא, ואז את הגובה הנוכחי והיעד.', noFill:'היעד אינו גבוה מהנוכחי — אין צורך במילוי.'}
+        level:{needLevels:'הזן גובה נוכחי ויעד.', needArea:'הזן שטח פני מים תקין במ״ר.', needCalib:'הזן נפח מלא וגובה מלא.', noFill:'היעד אינו גבוה מהנוכחי — אין צורך במילוי.', noteArea:'הזן שטח + גבהים (אופציונלי: ספיקה וזמן התחלה).', noteCalib:'הזן נפח מלא וגובה מלא + גבהים.'}
       }
     };
 
-    let currentLang = 'he'; // default
+    let currentLang = 'en';
     function applyLang(){
       const t = i18n[currentLang];
       document.documentElement.lang = (currentLang==='he'?'he':'en');
@@ -345,15 +397,22 @@
       set('lbl-density', `${t.lbl_density} <span class="opt">${t.defaultDensity}</span>`);
       set('help-vol', t.help_vol); set('sum-how', t.how_title); set('help-how', t.how_help);
 
+      // Method pills
+      set('pill-area', t.h2_level_method_area);
+      set('pill-calib', t.h2_level_method_calib);
+      set('lbl-surface', `${t.surface} <span class="req">${t.required}</span>`);
+      set('help-surface', t.help_surface);
+
       set('lbl-full-vol', `${t.full_vol} <span class="req">${t.required}</span>`);
       set('lbl-full-lvl', `${t.full_level} <span class="req">${t.required}</span>`);
+      set('help-calib', t.calib_help);
+
       set('lbl-now-lvl', `${t.now_level} <span class="req">${t.required}</span>`);
       set('lbl-target-lvl', `${t.target_level} <span class="req">${t.required}</span>`);
       set('sum-optional', t.optionalTiming);
       set('lbl-flow', `${t.flow} <span class="opt">${t.optional}</span>`);
       set('lbl-start', `${t.start} <span class="opt">${t.defaultNow}</span>`);
       set('lbl-round', `${t.round} <span class="opt">${t.optional}</span>`);
-      set('help-calib', t.calib_help);
 
       set('kpi-dppm', t.kpi_dppm); set('kpi-liters', t.kpi_liters);
       set('kpi-dh', t.kpi_dh); set('kpi-dv', t.kpi_dv);
@@ -373,9 +432,9 @@
 
       const toggleBtn = document.getElementById('lang-toggle'); if(toggleBtn) toggleBtn.textContent = t.toggle;
 
-      // Refresh note texts if already visible
-      const cNote = document.getElementById('chlorine-note'); if(cNote){ if(cNote.classList.contains('err')) cNote.textContent = t.notes.needFields; else if(cNote.classList.contains('warn')) cNote.textContent = t.notes.targetLow; else cNote.textContent = t.notes.calc; }
-      const lNote = document.getElementById('level-note'); if(lNote){ if(lNote.classList.contains('err')) lNote.textContent = i18n[currentLang].level.needFields; else if(lNote.classList.contains('warn')) lNote.textContent = i18n[currentLang].level.noFill; else lNote.textContent = t.notes.calc; }
+      // Note text hint per method
+      const note = document.getElementById('level-note');
+      note.textContent = (method==='area') ? t.level.noteArea : t.level.noteCalib;
     }
 
     const toggle = document.getElementById('lang-toggle');
@@ -384,7 +443,10 @@
     // Load preferred language
     let saved = localStorage.getItem('srf_calc_lang');
     if(saved === 'he' || saved === 'en') currentLang = saved;
+
+    // Init
     applyLang();
+    setMethod('area');
 
     // Prefill a couple of examples
     window.addEventListener('DOMContentLoaded', ()=>{
